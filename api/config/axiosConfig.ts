@@ -38,7 +38,12 @@ axiosInstance.interceptors.response.use(
     return response as any;
   },
   (error) => {
-    const message = error?.response?.data?.message || error?.message || 'Network error';
+    const data = error?.response?.data;
+    if (data && typeof data === 'object' && 'variant' in data) {
+      // Return standard envelope for 4xx so services can handle variant
+      return data;
+    }
+    const message = error?.message || 'Network error';
     return Promise.reject(new Error(message));
   }
 );
